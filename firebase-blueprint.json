@@ -1,0 +1,39 @@
+{
+  "entities": {
+    "MedicalRecord": {
+      "title": "Medical Record",
+      "description": "A medical journal entry containing lab results and vitals.",
+      "type": "object",
+      "properties": {
+        "date": { "type": "string" },
+        "type": { "type": "string" },
+        "weight": { "type": "number" },
+        "notes": { "type": "string" },
+        "rur_protein": { "type": "number" },
+        "rur_creatinine": { "type": "number" },
+        "rur_pc_ratio": { "type": "number" },
+        "rur_ac_ratio": { "type": "number" },
+        "rhm_hb": { "type": "number" },
+        "rhm_wbc": { "type": "number" },
+        "rhm_platelets": { "type": "number" },
+        "rhm_hematocrit": { "type": "number" },
+        "rhm_rbc": { "type": "number" },
+        "rch_urea": { "type": "number" },
+        "rch_creatinine": { "type": "number" },
+        "rst_tac_level": { "type": "number" },
+        "creatinine": { "type": "number" },
+        "bp_sys": { "type": "integer" },
+        "bp_dia": { "type": "integer" },
+        "urine_output": { "type": "number" },
+        "createdAt": { "type": "string" }
+      },
+      "required": ["date", "type"]
+    }
+  },
+  "firestore": {
+    "/reports/{reportId}": {
+      "schema": "MedicalRecord",
+      "description": "Collection of medical reports."
+    }
+  }
+}

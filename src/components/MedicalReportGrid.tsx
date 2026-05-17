@@ -6,7 +6,7 @@ import { format } from 'date-fns';
 interface Props {
   records: MedicalRecord[];
   onEdit: (record: MedicalRecord) => void;
-  onDelete: (id: number) => void;
+  onDelete: (id: string | number) => void;
   sortConfig: { key: keyof MedicalRecord; direction: 'asc' | 'desc' };
   onSort: (key: keyof MedicalRecord) => void;
 }

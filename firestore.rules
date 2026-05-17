@@ -1,0 +1,15 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    // Basic rules for the medical journal
+    // For now, allowing read/write for the demo.
+    // In a production app, you should use Firebase Authentication to secure this data.
+    match /reports/{reportId} {
+      allow read, write: if true;
+    }
+    
+    match /{document=**} {
+      allow read, write: if false;
+    }
+  }
+}
