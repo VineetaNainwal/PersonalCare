@@ -8,6 +8,8 @@ import { MedicalRecord, MedicalRecordFormData, ReportType } from './types';
 import { exportToCSV, exportToPDF } from './lib/exportUtils';
 import { motion } from 'motion/react';
 
+import { reportService } from './services/reportService';
+
 export default function App() {
   const [currentPage, setCurrentPage] = useState<'home' | 'dashboard'>('home');
   const [isLoggedIn, setIsLoggedIn] = useState(false);
@@ -25,8 +27,7 @@ export default function App() {
   const fetchRecords = async () => {
     setIsLoading(true);
     try {
-      const response = await fetch('/api/reports');
-      const data = await response.json();
+      const data = await reportService.getAll();
       setRecords(data);
     } catch (error) {
       console.error('Failed to fetch records:', error);
@@ -41,33 +42,26 @@ export default function App() {
 
   const handleSave = async (formData: MedicalRecordFormData) => {
     try {
-      const url = editingRecord ? `/api/reports/${editingRecord.id}` : '/api/reports';
-      const method = editingRecord ? 'PUT' : 'POST';
-      
-      const response = await fetch(url, {
-        method,
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(formData),
-      });
-
-      if (response.ok) {
-        setIsFormOpen(false);
-        setEditingRecord(undefined);
-        fetchRecords();
+      if (editingRecord) {
+        await reportService.update(editingRecord.id, formData);
+      } else {
+        await reportService.create(formData);
       }
+      
+      setIsFormOpen(false);
+      setEditingRecord(undefined);
+      fetchRecords();
     } catch (error) {
       console.error('Failed to save record:', error);
     }
   };
 
-  const handleDelete = async (id: number) => {
+  const handleDelete = async (id: string | number) => {
     if (!confirm('Are you sure you want to delete this record?')) return;
     
     try {
-      const response = await fetch(`/api/reports/${id}`, { method: 'DELETE' });
-      if (response.ok) {
-        fetchRecords();
-      }
+      await reportService.delete(id);
+      fetchRecords();
     } catch (error) {
       console.error('Failed to delete record:', error);
     }
