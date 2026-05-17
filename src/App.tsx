@@ -1,12 +1,14 @@
 import { useState, useEffect, useMemo } from 'react';
-import { Plus, Download, Filter, Search, Stethoscope, RefreshCcw, LayoutGrid } from 'lucide-react';
+import { Plus, Download, Filter, Search, Stethoscope, RefreshCcw, LayoutGrid, Home as HomeIcon } from 'lucide-react';
 import MedicalReportForm from './components/MedicalReportForm';
 import MedicalReportGrid from './components/MedicalReportGrid';
+import Home from './components/Home';
 import { MedicalRecord, MedicalRecordFormData, ReportType } from './types';
 import { exportToCSV, exportToPDF } from './lib/exportUtils';
 import { motion } from 'motion/react';
 
 export default function App() {
+  const [currentPage, setCurrentPage] = useState<'home' | 'dashboard'>('home');
   const [records, setRecords] = useState<MedicalRecord[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [isFormOpen, setIsFormOpen] = useState(false);
@@ -106,16 +108,25 @@ export default function App() {
             <Stethoscope className="w-5 h-5" />
           </div>
           <div>
-            <h1 className="text-xl font-semibold tracking-tight text-natural-title">RenalCare Journal</h1>
+            <h1 className="text-lg md:text-xl font-semibold tracking-tight text-natural-title">Vineeta's Care Journal</h1>
             <p className="hidden md:block text-[10px] uppercase tracking-widest font-bold text-natural-sage">Health Management</p>
           </div>
         </div>
 
-        <div className="flex items-center gap-6">
-          <nav className="hidden lg:flex gap-6 text-sm font-medium text-natural-muted">
-            <a href="#" className="text-natural-sage border-b-2 border-natural-sage pb-1">Dashboard</a>
-            <a href="#" className="hover:text-natural-sage transition-colors">Lab Results</a>
-            <a href="#" className="hover:text-natural-sage transition-colors">Vitals History</a>
+        <div className="flex items-center gap-4 md:gap-6">
+          <nav className="flex gap-4 md:gap-6 text-sm font-medium text-natural-muted">
+            <button 
+              onClick={() => setCurrentPage('home')}
+              className={`pb-1 transition-all ${currentPage === 'home' ? 'text-natural-sage border-b-2 border-natural-sage font-bold' : 'hover:text-natural-sage'}`}
+            >
+              Home
+            </button>
+            <button 
+              onClick={() => setCurrentPage('dashboard')}
+              className={`pb-1 transition-all ${currentPage === 'dashboard' ? 'text-natural-sage border-b-2 border-natural-sage font-bold' : 'hover:text-natural-sage'}`}
+            >
+              Dashboard
+            </button>
           </nav>
           
           <div className="flex items-center gap-3 pl-6 md:border-l border-natural-border">
@@ -135,9 +146,12 @@ export default function App() {
 
       {/* Main Content */}
       <main className="flex-1 pt-24 pb-8 px-4 md:px-8 max-w-7xl mx-auto w-full">
-        <div className="flex flex-col gap-6">
-          {/* Header Section */}
-          <div className="flex flex-col md:flex-row md:items-end justify-between gap-6">
+        {currentPage === 'home' ? (
+          <Home onNavigate={() => setCurrentPage('dashboard')} />
+        ) : (
+          <div className="flex flex-col gap-6">
+            {/* Header Section */}
+            <div className="flex flex-col md:flex-row md:items-end justify-between gap-6">
             <motion.div 
               initial={{ opacity: 0, x: -20 }}
               animate={{ opacity: 1, x: 0 }}
@@ -233,16 +247,10 @@ export default function App() {
             </div>
           </motion.div>
         </div>
+        )}
       </main>
 
-      <footer className="mt-auto h-8 bg-natural-sage text-white text-[10px] flex items-center px-8 justify-between opacity-90">
-        <div className="flex gap-4">
-          <span>Database: renal_history.sqlite</span>
-          <span>Security: Local Cryptography</span>
-        </div>
-        <div className="flex items-center gap-2">
-          <span>All health data remains encrypted</span>
-        </div>
+      <footer className="mt-auto h-10 bg-natural-sage text-white text-[10px] flex items-center px-8 justify-between opacity-90">
       </footer>
 
       <MedicalReportForm 

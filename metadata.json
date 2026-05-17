@@ -1,6 +1,6 @@
 {
-  "name": "RenalFlow: Transplant Care",
-  "description": "A personal medical report manager for kidney transplant patients to track lab results, vitals, and medication updates.",
+  "name": "Vineeta's Care Journal",
+  "description": "A personal health tracking companion for Vineeta, focusing on lab results, vitals, and motivational resilience.",
   "requestFramePermissions": [],
   "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
 }
