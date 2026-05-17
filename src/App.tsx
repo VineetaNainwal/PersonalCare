@@ -3,12 +3,14 @@ import { Plus, Download, Filter, Search, Stethoscope, RefreshCcw, LayoutGrid, Ho
 import MedicalReportForm from './components/MedicalReportForm';
 import MedicalReportGrid from './components/MedicalReportGrid';
 import Home from './components/Home';
+import Login from './components/Login';
 import { MedicalRecord, MedicalRecordFormData, ReportType } from './types';
 import { exportToCSV, exportToPDF } from './lib/exportUtils';
 import { motion } from 'motion/react';
 
 export default function App() {
   const [currentPage, setCurrentPage] = useState<'home' | 'dashboard'>('home');
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [records, setRecords] = useState<MedicalRecord[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [isFormOpen, setIsFormOpen] = useState(false);
@@ -121,25 +123,44 @@ export default function App() {
             >
               Home
             </button>
-            <button 
-              onClick={() => setCurrentPage('dashboard')}
-              className={`pb-1 transition-all ${currentPage === 'dashboard' ? 'text-natural-sage border-b-2 border-natural-sage font-bold' : 'hover:text-natural-sage'}`}
-            >
-              Dashboard
-            </button>
+            {isLoggedIn && (
+              <button 
+                onClick={() => setCurrentPage('dashboard')}
+                className={`pb-1 transition-all ${currentPage === 'dashboard' ? 'text-natural-sage border-b-2 border-natural-sage font-bold' : 'hover:text-natural-sage'}`}
+              >
+                Dashboard
+              </button>
+            )}
           </nav>
           
           <div className="flex items-center gap-3 pl-6 md:border-l border-natural-border">
-            <button 
-              onClick={() => {
-                setEditingRecord(undefined);
-                setIsFormOpen(true);
-              }}
-              className="hidden md:flex items-center gap-2 bg-natural-sage hover:bg-natural-sage-dark text-white px-5 py-2 rounded-lg font-semibold transition-all shadow-sm"
-            >
-              <Plus className="w-4 h-4" />
-              New Entry
-            </button>
+            {isLoggedIn ? (
+              <>
+                <button 
+                  onClick={() => {
+                    setEditingRecord(undefined);
+                    setIsFormOpen(true);
+                  }}
+                  className="hidden md:flex items-center gap-2 bg-natural-sage hover:bg-natural-sage-dark text-white px-5 py-2 rounded-lg font-semibold transition-all shadow-sm"
+                >
+                  <Plus className="w-4 h-4" />
+                  New Entry
+                </button>
+                <button 
+                  onClick={() => setIsLoggedIn(false)}
+                  className="text-xs font-bold text-natural-muted hover:text-natural-brown transition-colors uppercase tracking-widest"
+                >
+                  Logout
+                </button>
+              </>
+            ) : (
+              <button 
+                onClick={() => setCurrentPage('dashboard')}
+                className="text-xs font-bold text-natural-sage hover:text-natural-sage-dark transition-colors uppercase tracking-widest"
+              >
+                Login
+              </button>
+            )}
           </div>
         </div>
       </nav>
@@ -149,8 +170,11 @@ export default function App() {
         {currentPage === 'home' ? (
           <Home onNavigate={() => setCurrentPage('dashboard')} />
         ) : (
-          <div className="flex flex-col gap-6">
-            {/* Header Section */}
+          !isLoggedIn ? (
+            <Login onLogin={(success) => setIsLoggedIn(success)} />
+          ) : (
+            <div className="flex flex-col gap-6">
+              {/* Header Section */}
             <div className="flex flex-col md:flex-row md:items-end justify-between gap-6">
             <motion.div 
               initial={{ opacity: 0, x: -20 }}
@@ -247,6 +271,7 @@ export default function App() {
             </div>
           </motion.div>
         </div>
+          )
         )}
       </main>
 
@@ -264,15 +289,17 @@ export default function App() {
       />
 
       {/* Floating Action Button for Mobile */}
-      <button 
-        onClick={() => {
-          setEditingRecord(undefined);
-          setIsFormOpen(true);
-        }}
-        className="fixed md:hidden bottom-12 right-6 w-14 h-14 bg-natural-sage text-white rounded-full flex items-center justify-center shadow-2xl active:scale-95 z-50"
-      >
-        <Plus className="w-8 h-8" />
-      </button>
+      {isLoggedIn && (
+        <button 
+          onClick={() => {
+            setEditingRecord(undefined);
+            setIsFormOpen(true);
+          }}
+          className="fixed md:hidden bottom-12 right-6 w-14 h-14 bg-natural-sage text-white rounded-full flex items-center justify-center shadow-2xl active:scale-95 z-50"
+        >
+          <Plus className="w-8 h-8" />
+        </button>
+      )}
     </div>
   );
 }
