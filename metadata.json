@@ -1,0 +1,6 @@
+{
+  "name": "RenalFlow: Transplant Care",
+  "description": "A personal medical report manager for kidney transplant patients to track lab results, vitals, and medication updates.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
