@@ -11,8 +11,12 @@ import { motion } from 'motion/react';
 import { reportService } from './services/reportService';
 
 export default function App() {
-  const [currentPage, setCurrentPage] = useState<'home' | 'dashboard'>('home');
-  const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [currentPage, setCurrentPage] = useState<'home' | 'dashboard'>(() => {
+    return (localStorage.getItem('currentPage') as 'home' | 'dashboard') || 'home';
+  });
+  const [isLoggedIn, setIsLoggedIn] = useState(() => {
+    return localStorage.getItem('isLoggedIn') === 'true';
+  });
   const [records, setRecords] = useState<MedicalRecord[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [isFormOpen, setIsFormOpen] = useState(false);
@@ -39,6 +43,14 @@ export default function App() {
   useEffect(() => {
     fetchRecords();
   }, []);
+
+  useEffect(() => {
+    localStorage.setItem('isLoggedIn', String(isLoggedIn));
+  }, [isLoggedIn]);
+
+  useEffect(() => {
+    localStorage.setItem('currentPage', currentPage);
+  }, [currentPage]);
 
   const handleSave = async (formData: MedicalRecordFormData) => {
     try {
