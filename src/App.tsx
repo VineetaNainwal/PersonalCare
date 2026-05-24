@@ -11,8 +11,8 @@ import { motion } from 'motion/react';
 import { reportService } from './services/reportService';
 
 export default function App() {
-  const [currentPage, setCurrentPage] = useState<'home' | 'dashboard'>(() => {
-    return (localStorage.getItem('currentPage') as 'home' | 'dashboard') || 'home';
+  const [currentPage, setCurrentPage] = useState<'home' | 'report' | 'dashboard'>(() => {
+    return (localStorage.getItem('currentPage') as 'home' | 'report' | 'dashboard') || 'home';
   });
   const [isLoggedIn, setIsLoggedIn] = useState(() => {
     return localStorage.getItem('isLoggedIn') === 'true';
@@ -129,6 +129,12 @@ export default function App() {
             >
               Home
             </button>
+            <button 
+              onClick={() => setCurrentPage('report')}
+              className={`pb-1 transition-all ${currentPage === 'report' ? 'text-natural-sage border-b-2 border-natural-sage font-bold' : 'hover:text-natural-sage'}`}
+            >
+              Report
+            </button>
             {isLoggedIn && (
               <button 
                 onClick={() => setCurrentPage('dashboard')}
@@ -153,7 +159,10 @@ export default function App() {
                   New Entry
                 </button>
                 <button 
-                  onClick={() => setIsLoggedIn(false)}
+                  onClick={() => {
+                    setIsLoggedIn(false);
+                    setCurrentPage('home');
+                  }}
                   className="text-xs font-bold text-natural-muted hover:text-natural-brown transition-colors uppercase tracking-widest"
                 >
                   Logout
@@ -174,7 +183,97 @@ export default function App() {
       {/* Main Content */}
       <main className="flex-1 pt-24 pb-8 px-4 md:px-8 max-w-7xl mx-auto w-full">
         {currentPage === 'home' ? (
-          <Home onNavigate={() => setCurrentPage('dashboard')} />
+          <Home onNavigate={() => setCurrentPage('report')} />
+        ) : currentPage === 'report' ? (
+          <div className="flex flex-col gap-6">
+            {/* Header Section */}
+            <div className="flex flex-col md:flex-row md:items-end justify-between gap-6">
+              <motion.div 
+                initial={{ opacity: 0, x: -20 }}
+                animate={{ opacity: 1, x: 0 }}
+                className="space-y-1"
+              >
+                <h2 className="text-2xl font-bold text-natural-title">Medical Report</h2>
+                <p className="text-sm text-natural-muted">A read-only view of the post-transplant care journal.</p>
+              </motion.div>
+
+              <div className="flex flex-wrap items-center gap-2">
+                <button 
+                  onClick={() => exportToCSV(filteredAndSortedRecords)}
+                  className="flex items-center gap-2 px-4 py-2 bg-white border border-natural-border text-natural-muted rounded-lg hover:bg-natural-bg transition-colors font-medium text-sm"
+                >
+                  <Download className="w-4 h-4" />
+                  Export CSV
+                </button>
+                <button 
+                  onClick={fetchRecords}
+                  className="p-2 bg-white border border-natural-border text-natural-muted rounded-lg hover:text-natural-sage transition-colors"
+                  title="Refresh Records"
+                >
+                  <RefreshCcw className={`w-4 h-4 ${isLoading ? 'animate-spin' : ''}`} />
+                </button>
+              </div>
+            </div>
+
+            {/* Filters Bar */}
+            <div className="bg-white p-4 rounded-2xl shadow-sm border border-natural-border grid grid-cols-1 md:grid-cols-12 gap-4">
+              <div className="md:col-span-8 relative">
+                <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-natural-label" />
+                <input 
+                  type="text"
+                  placeholder="Search in notes..."
+                  value={searchTerm}
+                  onChange={(e) => setSearchTerm(e.target.value)}
+                  className="w-full pl-10 pr-4 py-2 bg-natural-bg border border-natural-border rounded-lg focus:ring-1 focus:ring-natural-sage outline-none transition-all text-sm"
+                />
+              </div>
+              
+              <div className="md:col-span-4 relative">
+                <Filter className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-[#808C80]" />
+                <select 
+                  value={filterType}
+                  onChange={(e) => setFilterType(e.target.value as any)}
+                  className="w-full pl-10 pr-4 py-2 bg-natural-bg border border-natural-border rounded-lg focus:ring-1 focus:ring-natural-sage outline-none appearance-none transition-all text-sm font-medium text-natural-muted"
+                >
+                  <option value="all">All Records</option>
+                  <option value="lab">Lab Results</option>
+                  <option value="vitals">Vitals (BP/Weight)</option>
+                  <option value="medication">Medication Log</option>
+                  <option value="notes">Doctor Notes</option>
+                </select>
+              </div>
+            </div>
+
+            {/* Records Grid */}
+            <motion.div 
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.1 }}
+              className="bg-white rounded-2xl shadow-sm border border-natural-border overflow-hidden flex flex-col"
+            >
+              {isLoading ? (
+                <div className="py-20 flex flex-col items-center justify-center gap-4 text-natural-label">
+                  <RefreshCcw className="w-8 h-8 animate-spin" />
+                  <p className="text-sm font-medium">Updating journal records...</p>
+                </div>
+              ) : (
+                <MedicalReportGrid 
+                  records={filteredAndSortedRecords}
+                  sortConfig={sortConfig}
+                  onSort={handleSort}
+                  isReadOnly={true}
+                />
+              )}
+              
+              <div className="px-6 py-3 bg-natural-bg border-t border-natural-border flex justify-between items-center text-[11px] font-bold text-natural-label uppercase tracking-widest">
+                <span>Total records: {records.length}</span>
+                <div className="flex items-center gap-2">
+                  <div className="w-2 h-2 rounded-full bg-green-500 animate-pulse"></div>
+                  <span>Read-Only View</span>
+                </div>
+              </div>
+            </motion.div>
+          </div>
         ) : (
           !isLoggedIn ? (
             <Login onLogin={(success) => setIsLoggedIn(success)} />

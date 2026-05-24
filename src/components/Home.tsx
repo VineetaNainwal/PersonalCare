@@ -56,7 +56,7 @@ export default function Home({ onNavigate }: { onNavigate: () => void }) {
             onClick={onNavigate}
             className="px-8 py-4 bg-natural-sage hover:bg-natural-sage-dark text-white rounded-xl font-bold flex items-center gap-2 transition-all shadow-lg"
           >
-            Go to Dashboard <ArrowRight className="w-5 h-5" />
+            Go to Report <ArrowRight className="w-5 h-5" />
           </motion.button>
         </div>
 
