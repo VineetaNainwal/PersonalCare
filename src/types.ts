@@ -1,7 +1,7 @@
 export type ReportType = 'lab' | 'vitals' | 'medication' | 'notes';
 
 export interface MedicalRecord {
-  id: number;
+  id: string | number;
   date: string;
   type: ReportType;
   weight?: number;
